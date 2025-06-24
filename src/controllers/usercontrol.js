@@ -137,8 +137,7 @@ const cancelRide = async (req, res) => {
       id: uuidv4(),
       rideId,
       statusId: cancelledStatus.id,
-      updated_by: "user",
-      updated_at: new Date().toISOString(),
+      updated_by: "user"
     });
 
     res.status(200).json({ message: "Ride cancelled successfully" });
@@ -148,6 +147,34 @@ const cancelRide = async (req, res) => {
       .json({ message: "Error cancelling ride", error: error.message });
   }
 };
+
+
+
+const RideStatusHistory = async(req,res) => {
+    const {rideId} = req.params;
+
+  if(!rideId){
+    res.status(400).json({message:"ride id is required"})
+  }
+
+  try {
+      const history = await RideStatusHistory.query()
+      .where('rideId', rideId)
+      .withGraphFetched('status') 
+      .orderBy('updated_at', 'asc'); 
+
+      if(history.length==0){
+        res.status(404).json({message:"No history available for this ride"})
+      }
+
+    res.status(200).json({message:"ride history fetched succesfully",history})
+  } catch (error) {
+      res.status(500).json({message:"error occured while fetching",error:error.messagae})
+  }
+
+}
+
+
 
 module.exports = {
   createUsers,
