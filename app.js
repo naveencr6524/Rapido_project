@@ -1,3 +1,4 @@
+require('./db')
 const express =  require('express');
 const app = express();
 const router = require('./src/Routes/routes');
