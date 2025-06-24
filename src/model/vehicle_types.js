@@ -1,5 +1,5 @@
 const { Model } = require('objection')
-const Drivers=require('../model/drivers.js')
+const Drivers=require('./Drivers.js')
 const Ride = require('./Ride.js')
 
 class VehicleTypes extends Model {
@@ -43,4 +43,4 @@ class VehicleTypes extends Model {
     }
 }
 
-module.exports = VehicleTypes;
+module.exports = {VehicleTypes};
