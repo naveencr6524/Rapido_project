@@ -2,6 +2,7 @@ const User = require("../../models/User");
 const Ride = require("../../models/Ride");
 const RideStatus = require("../../models/RideStatus");
 const RideStatusHistory = require("../../models/RideStatusHistory");
+const VehicleType = require('../../models/VehicleType')
 
 const createUsers = async (req, res) => {
   const { name, email, phone } = req.body;
@@ -29,51 +30,53 @@ const createUsers = async (req, res) => {
   }
 };
 
-
 const bookRide = async (req, res) => {
   const { userId, pickupLocation, dropLocation, vehicleTypeId } = req.body;
 
   if (!userId || !pickupLocation || !dropLocation || !vehicleTypeId) {
-
     return res.status(400).json({ message: "Must fill all inputs" });
   }
 
   try {
     const pendingStatus = await RideStatus.query().findOne({ code: "pending" });
 
+    const vehicleType = await VehicleType.query()
+      .findById(vehicleTypeId)
+      .where('isAvailable', true); 
+
+    if (!vehicleType) {
+      return res.status(400).json({ message: "Selected vehicle type is not currently available" });
+    }
+
     if (!pendingStatus) {
-      return res
-        .status(500)
-        .json({ message: "Ride status 'pending' not found" });
+      return res.status(500).json({ message: "Ride status 'pending' not found" });
     }
 
     const rideData = await Ride.query().upsertGraph({
-  userId,
-  pickupLocation,
-  dropLocation,
-  vehicleTypeId,
-  fare: 100,
-  statusId: pendingStatus.id,
-  statusHistory: [
-    {
+      userId,
+      pickupLocation,
+      dropLocation,
+      vehicleTypeId,
+      fare: 100,
       statusId: pendingStatus.id,
-      updated_by: "user", 
-    }
-  ]
-}, {
-  relate: true,
-  insertMissing: true,
-  noDelete:true
-});
-
+      statusHistory: [
+        {
+          statusId: pendingStatus.id,
+          updated_by: "user"
+        }
+      ]
+    }, {
+      relate: true,
+      insertMissing: true,
+      noDelete: true
+    });
 
     res.status(201).json({ message: "Ride created successfully", rideData });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Ride can't be placed", error: error.message });
+    res.status(500).json({ message: "Ride can't be placed", error: error.message });
   }
 };
+
 
 const getUserRides = async (req, res) => {
   const { userId } = req.params;
