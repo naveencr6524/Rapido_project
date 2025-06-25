@@ -75,7 +75,7 @@ class Ride extends Model {
         modelClass: RideStatusHistory,
         join: {
           from: `${this.tableName}.id`,
-          to: `${RideStatusHistory}.rideId`,
+          to: `${RideStatusHistory.tableName}.rideId`,
         },
       },
     };

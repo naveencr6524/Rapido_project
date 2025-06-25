@@ -1,7 +1,7 @@
-require('./db')
+require('./db.js')
 const express =  require('express');
 const app = express();
-const router = require('./src/Routes/routes');
+const router = require('./Routes/routes.js');
 
 
 app.use(express.json());
