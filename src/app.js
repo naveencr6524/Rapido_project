@@ -1,7 +1,7 @@
 require('./db.js')
 const express =  require('express');
 const app = express();
-const router = require('./models/module/user/routes.js');
+const router = require('./module/user/routes.js');
 
 
 app.use(express.json());
