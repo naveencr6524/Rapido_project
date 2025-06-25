@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require('./userController')
 const validators = require('../validators/validators');
 const validate  = require('../validators/validateMiddleWare');
-
+ const driverController = require('./driverController.js')
 
 // user scenarios
 
@@ -14,5 +14,14 @@ const validate  = require('../validators/validateMiddleWare');
   router.post('/cancelRide',validators.cancelRideValidator,validate,controller.cancelRide);
   router.get('/rideStatusHistory/:rideId',validators.getRideHistoryValidator,validate,controller.RideStatusHistories)
 
+
+//driver scenarios
+
+router.post('/createdriver',driverController.signUpDriver);
+router.get('/pendingrides',driverController.getPendingRides);
+router.patch('/pendingrides/:rideId',driverController.acceptRide);
+router.get('/driverrides/:driverId',driverController.getDriverRides);
+router.patch('/ridestatus/:rideId',driverController.updateRideStatus);
+router.get('/ridedetails/:rideId',driverController.getRideDetails)
   
   module.exports=router

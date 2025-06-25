@@ -3,10 +3,6 @@ const express =  require('express');
 const app = express();
 const router = require('./module/user/userRoutes');
 
-const router = require('./Routes/routes.js');
-origin/feature-vehicle
-
-
 app.use(express.json());
 
 app.use('/',router);
