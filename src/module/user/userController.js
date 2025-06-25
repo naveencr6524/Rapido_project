@@ -34,6 +34,7 @@ const bookRide = async (req, res) => {
   const { userId, pickupLocation, dropLocation, vehicleTypeId } = req.body;
 
   if (!userId || !pickupLocation || !dropLocation || !vehicleTypeId) {
+
     return res.status(400).json({ message: "Must fill all inputs" });
   }
 
@@ -46,15 +47,27 @@ const bookRide = async (req, res) => {
         .json({ message: "Ride status 'pending' not found" });
     }
 
-    const ride = await Ride.query().insert({
-      userId,
-      pickupLocation,
-      dropLocation,
-      vehicleTypeId,
+    const rideData = await Ride.query().upsertGraph({
+  userId,
+  pickupLocation,
+  dropLocation,
+  vehicleTypeId,
+  fare: 100,
+  statusId: pendingStatus.id,
+  statusHistory: [
+    {
       statusId: pendingStatus.id,
-    });
+      updated_by: "user", 
+    }
+  ]
+}, {
+  relate: true,
+  insertMissing: true,
+  noDelete:true
+});
 
-    res.status(201).json({ message: "Ride created successfully", ride });
+
+    res.status(201).json({ message: "Ride created successfully", rideData });
   } catch (error) {
     res
       .status(500)
@@ -114,9 +127,7 @@ const cancelRide = async (req, res) => {
     }
 
     const pendingStatus = await RideStatus.query().findOne({ code: "pending" });
-    const cancelledStatus = await RideStatus.query().findOne({
-      code: "cancelled",
-    });
+    const cancelledStatus = await RideStatus.query().findOne({ code: "cancelled" });
 
     if (ride.statusId !== pendingStatus.id) {
       return res
@@ -129,7 +140,7 @@ const cancelRide = async (req, res) => {
    await Ride.query().upsertGraph({
   id: rideId,
   statusId: cancelledStatus.id,
-  updatedAt: new Date().toISOString(),
+  // updatedAt: new Date().toISOString(),
   statusHistory: [
     {
       rideId,

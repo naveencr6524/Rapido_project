@@ -17,7 +17,7 @@ class RideStatusHistory extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['id', 'rideId', 'statusId', 'updated_by'],
+      required: [ 'rideId', 'statusId', 'updated_by'],
       properties: {
         id: uuid,
         rideId: uuid,

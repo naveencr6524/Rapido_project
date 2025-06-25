@@ -15,7 +15,7 @@ class Ride extends Model {
   static get jsonSchema() {
   return {
     type: 'object',
-    required: ['id', 'userId', 'pickupLocation', 'dropLocation', 'vehicleTypeId', 'fare', 'statusId'],
+    required: [ 'userId', 'pickupLocation', 'dropLocation', 'vehicleTypeId', 'fare', 'statusId'],
     properties: {
       id: uuid,
       userId: uuid,
@@ -82,7 +82,7 @@ class Ride extends Model {
         modelClass: RideStatusHistory,
         join: {
           from: `${this.tableName}.id`,
-          to: `${RideStatusHistory}.rideId`,
+          to: `${RideStatusHistory.tableName}.rideId`,
         },
       },
     };
