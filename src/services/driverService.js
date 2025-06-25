@@ -1,7 +1,7 @@
 const { v4: uuid } = require('uuid')
-const Driver = require('../models/Driver.js')
-const Ride = require('../models/Ride.js')
-const RideStatus = require('../models/RideStatus.js')
+const Driver = require('../models/constants/Driver.js')
+const Ride = require('../models/constants/Ride.js')
+const RideStatus = require('../models/constants/RideStatus.js')
 
 exports.signUpDriver = async (data) => {
     return await Driver.query().insert({

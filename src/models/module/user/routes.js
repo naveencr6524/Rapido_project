@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/usercontrol')
-const driverController = require('../controllers/driverController.js')
+const controller = require('./usercontrol.js')
+const driverController = require('./driverController.js.js')
 
 // user scenarios
 

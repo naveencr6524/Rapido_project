@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator')
-const driverService = require('../services/driverService.js')
+const driverService = require('../../../services/driverService.js')
 const validations = require('../validators/driverValidator.js')
 
 const runValidation = async (req, res, rules) => {

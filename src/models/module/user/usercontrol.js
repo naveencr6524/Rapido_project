@@ -1,8 +1,8 @@
 const { v4: uuidv4 } = require("uuid");
-const User = require("../models/User");
-const Ride = require("../models/Ride");
-const RideStatus = require("../models/RideStatus");
-const RideStatusHistory = require("../models/RideStatusHistory");
+const User = require("../../constants/User");
+const Ride = require("../../constants/Ride");
+const RideStatus = require("../../constants/RideStatus");
+const RideStatusHistory = require("../../constants/RideStatusHistory");
 
 const createUsers = async (req, res) => {
   const { name, email, phone } = req.body;
