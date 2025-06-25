@@ -1,26 +1,31 @@
 const { Model } = require('objection');
+const { v4: uuidv4 } = require("uuid");
+const {timeStamps, uuid, number} = require('./constants/Val')
 
 
 class VehicleType extends Model {
   static get tableName() {
     return 'vehicle_types';
   }
+    
+    $beforeInsert(){
+         if(!this.id){
+          this.id = uuidv4()
+         }
+      }
 
-  static get idColumn() {
-    return 'id';
-  }
-
+  
   static get jsonSchema() {
     return {
       type: 'object',
       required: ['id', 'typeName', 'baseFare', 'perKmRate'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
+        id: uuid,
         typeName: { type: 'string', minLength: 1 },
-        baseFare: { type: 'number' },
-        perKmRate: { type: 'number' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        baseFare: number,
+        perKmRate: number,
+        createdAt: timeStamps,
+        updatedAt: timeStamps
       }
     };
   }
@@ -33,16 +38,16 @@ class VehicleType extends Model {
         relation: Model.HasManyRelation,
         modelClass: Driver,
         join: {
-          from: 'vehicle_types.id',
-          to: 'drivers.vehicleTypeId'
+          from: `${this.tableName}.id`,
+          to: `${Driver.tableName}.vehicleTypeId`
         }
       },
       rides: {
         relation: Model.HasManyRelation,
         modelClass: Ride,
         join: {
-          from: 'vehicle_types.id',
-          to: 'rides.vehicleTypeId'
+          from: `${this.tableName}.id`,
+          to: `${Ride.tableName}.vehicleTypeId`
         }
       }
     };

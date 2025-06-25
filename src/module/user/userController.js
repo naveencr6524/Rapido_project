@@ -1,8 +1,7 @@
-const { v4: uuidv4 } = require("uuid");
-const User = require("../models/User");
-const Ride = require("../models/Ride");
-const RideStatus = require("../models/RideStatus");
-const RideStatusHistory = require("../models/RideStatusHistory");
+const User = require("../../models/User");
+const Ride = require("../../models/Ride");
+const RideStatus = require("../../models/RideStatus");
+const RideStatusHistory = require("../../models/RideStatusHistory");
 
 const createUsers = async (req, res) => {
   const { name, email, phone } = req.body;
@@ -13,7 +12,6 @@ const createUsers = async (req, res) => {
 
   try {
     const users = await User.query().insert({
-      id: uuidv4(),
       name,
       email,
       phone,
@@ -30,6 +28,7 @@ const createUsers = async (req, res) => {
     });
   }
 };
+
 
 const bookRide = async (req, res) => {
   const { userId, pickupLocation, dropLocation, vehicleTypeId } = req.body;
@@ -48,7 +47,6 @@ const bookRide = async (req, res) => {
     }
 
     const ride = await Ride.query().insert({
-      id: uuidv4(),
       userId,
       pickupLocation,
       dropLocation,
@@ -68,7 +66,7 @@ const getUserRides = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const userRides = await Ride.query().where("usereId", userId);
+    const userRides = await Ride.query().where("userId", userId);
 
     if (userRides.length == 0) {
       res.status(404).json({ message: "this  user has no rides" });
@@ -108,7 +106,7 @@ const cancelRide = async (req, res) => {
     const ride = await Ride.query().findById(rideId);
 
     if (!ride) {
-      res.status(404).json({ message: "ride not found" });
+       return res.status(404).json({ message: "ride not found" });
     }
 
     if (ride.userId !== userId) {
@@ -128,17 +126,23 @@ const cancelRide = async (req, res) => {
         });
     }
 
-    await Ride.query().findById(rideId).patch({
-      statusId: cancelledStatus.id,
-      updatedAt: new Date().toISOString(),
-    });
-
-    await RideStatusHistory.query().insert({
-      id: uuidv4(),
+   await Ride.query().upsertGraph({
+  id: rideId,
+  statusId: cancelledStatus.id,
+  updatedAt: new Date().toISOString(),
+  statusHistory: [
+    {
       rideId,
       statusId: cancelledStatus.id,
       updated_by: "user"
-    });
+    }
+  ]
+}, {
+  relate: true,
+  insertMissing: true,
+  noDelete:true
+});
+
 
     res.status(200).json({ message: "Ride cancelled successfully" });
   } catch (error) {
@@ -150,7 +154,7 @@ const cancelRide = async (req, res) => {
 
 
 
-const RideStatusHistory = async(req,res) => {
+const RideStatusHistories = async(req,res) => {
     const {rideId} = req.params;
 
   if(!rideId){
@@ -175,11 +179,11 @@ const RideStatusHistory = async(req,res) => {
 }
 
 
-
-module.exports = {
-  createUsers,
-  bookRide,
-  getUserRides,
-  getRideDeatils,
-  cancelRide,
-};
+module.exports= {
+    getRideDeatils,
+    createUsers,
+    cancelRide,
+    RideStatusHistories,
+    bookRide,
+    getUserRides
+}

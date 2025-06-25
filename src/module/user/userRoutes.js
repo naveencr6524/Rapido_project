@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/usercontrol')
+const controller = require('./userController')
 
 // user scenarios
 
@@ -9,6 +9,7 @@ const controller = require('../controllers/usercontrol')
   router.get('/getUserRides/:userId',controller.getUserRides);
   router.get('/getRideDetails/:rideId',controller.getRideDeatils);
   router.get('./cancelRide',controller.cancelRide);
+  router.get('/rideStatusHistory/:rideId',controller.RideStatusHistories)
   
 
 
