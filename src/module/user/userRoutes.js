@@ -2,17 +2,33 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./userController')
 const validators = require('../validators/validators');
+
 const validate  = require('../validators/validateMiddleWare');
+ const driverController = require('./driverController.js')
+
+const validate = require('../validators/validateMiddleWare');
+const driverController = require('./Controller.js')
 
 
 // user scenarios
 
-  router.post('/createuser',validators.createUserValidator,validate,controller.createUsers);
-  router.post('/bookride', validators.bookRideValidator,validate,controller.bookRide);
-  router.get('/getUserRides/:userId',validators.getUserRidesValidator,validate,controller.getUserRides);
-  router.get('/getRideDetails/:rideId',validators.getRideDetailsValidator,validate,controller.getRideDeatils);
-  router.post('/cancelRide',validators.cancelRideValidator,validate,controller.cancelRide);
-  router.get('/rideStatusHistory/:rideId',validators.getRideHistoryValidator,validate,controller.RideStatusHistories)
+router.post('/createuser', validators.createUserValidator, validate, controller.createUsers);
+router.post('/bookride', validators.bookRideValidator, validate, controller.bookRide);
+router.get('/getUserRides/:userId', validators.getUserRidesValidator, validate, controller.getUserRides);
+router.get('/getRideDetails/:rideId', validators.getRideDetailsValidator, validate, controller.getRideDeatils);
+router.post('/cancelRide', validators.cancelRideValidator, validate, controller.cancelRide);
+router.get('/rideStatusHistory/:rideId', validators.getRideHistoryValidator, validate, controller.RideStatusHistories)
 
-  
-  module.exports=router
+// Driver Scenarios
+router.post('/createdriver', driverController.signUpDriver);
+router.get('/pendingrides', driverController.getPendingRides);
+router.patch('/pendingrides/:driverId/:rideId', driverController.acceptRide);
+router.get('/driverrides/:driverId', driverController.getDriverRides);
+router.patch('/ridestatus/:driverId/:rideId', driverController.updateRideStatus);
+router.get('/ridedetails/:driverId/:rideId', driverController.getRideDetails);
+router.get('/vehicletypes', driverController.getAllVehicleTypes);
+router.post('/vehicletypes', driverController.assignVehicleType);
+router.post('/rides', driverController.bookRide);
+
+module.exports = router
+

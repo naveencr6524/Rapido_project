@@ -1,8 +1,7 @@
-require('./db')
+require('./db.js')
 const express =  require('express');
 const app = express();
-const router = require('./module/user/userRoutes');
-
+const router = require('./module/user/userRoutes.js');
 
 app.use(express.json());
 
