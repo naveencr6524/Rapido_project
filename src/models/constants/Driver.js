@@ -1,6 +1,6 @@
 const { Model } = require('objection');
 const { v4: uuidv4 } = require("uuid");
-const { uuid, string, timeStamps } = require('./constants/Val')
+const { uuid, string, timeStamps } = require('./Val')
 
 class Driver extends Model {
   static get tableName() {
@@ -17,7 +17,6 @@ class Driver extends Model {
     return {
       type: 'object',
       required: [
-        'id',
         'name',
         'email',
         'phone',

@@ -1,23 +1,11 @@
 
 
-const User = require("../../models/User");
-const Ride = require("../../models/Ride");
-const RideStatus = require("../../models/RideStatus");
-const RideStatusHistory = require("../../models/RideStatusHistory");
-const VehicleType = require('../../models/VehicleType')
-const Driver = require('../../models/Driver')
-
-
-const { v4: uuidv4 } = require("uuid");
 const User = require("../../models/constants/User");
 const Ride = require("../../models/constants/Ride");
 const RideStatus = require("../../models/constants/RideStatus");
 const RideStatusHistory = require("../../models/constants/RideStatusHistory");
-
-const User = require("../../models/User");
-const Ride = require("../../models/Ride");
-const RideStatus = require("../../models/RideStatus");
-const RideStatusHistory = require("../../models/RideStatusHistory");
+const VehicleType = require('../../models/constants/VehicleType')
+const Driver = require('../../models/constants/Driver')
 
 
 
@@ -57,18 +45,18 @@ const bookRide = async (req, res) => {
   try {
     const pendingStatus = await RideStatus.query().findOne({ code: "pending" });
 
-//     const driverAvailable = await Driver.query()
-//   .where({
-//     vehicleTypeId,
-//     isAvailable: true
-//   })
-//   .first();
+    const driverAvailable = await Driver.query()
+  .where({
+    vehicleTypeId,
+    isAvailable: true
+  })
+  .first();
 
-// if (!driverAvailable) {
-//   return res.status(400).json({
-//     message: "No available drivers for the selected vehicle type"
-//   });
-// }
+if (!driverAvailable) {
+  return res.status(400).json({
+    message: "No available drivers for the selected vehicle type"
+  });
+}
 
     if (!pendingStatus) {
       return res.status(500).json({ message: "Ride status 'pending' not found" });

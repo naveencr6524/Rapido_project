@@ -1,6 +1,6 @@
 const { Model } = require('objection');
 const { v4: uuidv4 } = require("uuid");
-const {timeStamps, uuid, number} = require('./constants/Val')
+const {timeStamps, uuid, number} = require('./Val')
 
 
 class VehicleType extends Model {
