@@ -24,3 +24,15 @@ exports.getRideDetailsValidation = [
   param('driverId').isUUID().withMessage('Valid driver ID is required'),
   param('rideId').isUUID().withMessage('Valid ride ID is required')
 ];
+
+exports.assignVehicleTypeValidator = [
+  body('driverId').isUUID().withMessage('Invalid driverId'),
+  body('vehicleTypeId').isUUID().withMessage('Invalid vehicleTypeId'),
+];
+
+exports.bookRideValidator = [
+  body('userId').isUUID().withMessage('Invalid userId'),
+  body('pickup').notEmpty().withMessage('Pickup location is required'),
+  body('drop').notEmpty().withMessage('Drop location is required'),
+  body('vehicleTypeId').isUUID().withMessage('Invalid vehicleTypeId'),
+];
