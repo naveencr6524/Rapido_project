@@ -3,6 +3,7 @@ const Ride = require("../../models/Ride");
 const RideStatus = require("../../models/RideStatus");
 const RideStatusHistory = require("../../models/RideStatusHistory");
 const VehicleType = require('../../models/VehicleType')
+const Driver = require('../../models/Driver')
 
 const createUsers = async (req, res) => {
   const { name, email, phone } = req.body;
@@ -40,13 +41,18 @@ const bookRide = async (req, res) => {
   try {
     const pendingStatus = await RideStatus.query().findOne({ code: "pending" });
 
-    const vehicleType = await VehicleType.query()
-      .findById(vehicleTypeId)
-      .where('isAvailable', true); 
+//     const driverAvailable = await Driver.query()
+//   .where({
+//     vehicleTypeId,
+//     isAvailable: true
+//   })
+//   .first();
 
-    if (!vehicleType) {
-      return res.status(400).json({ message: "Selected vehicle type is not currently available" });
-    }
+// if (!driverAvailable) {
+//   return res.status(400).json({
+//     message: "No available drivers for the selected vehicle type"
+//   });
+// }
 
     if (!pendingStatus) {
       return res.status(500).json({ message: "Ride status 'pending' not found" });
@@ -102,7 +108,7 @@ const getRideDeatils = async (req, res) => {
   try {
     const ride = await Ride.query()
       .findById(rideId)
-      .withGraphFetched("[status,vehicleType,driver]")
+      .withGraphFetched("[status,vehicleType,driver,statusHistory]")
       .throwIfNotFound();
     res.status(200).json({ mesage: "Ride details fetched successfully", ride });
   } catch (error) {
