@@ -1,15 +1,17 @@
 const { Model } = require('objection');
-const VehicleType = require('./VehicleType');
-const Ride = require('./Ride');
+const { v4: uuidv4 } = require("uuid");
+const { uuid, string, timeStamps } = require('./constants/Val')
 
 class Driver extends Model {
   static get tableName() {
     return 'drivers';
   }
 
-  static get idColumn() {
-    return 'id';
-  }
+    $beforeInsert(){
+         if(!this.id){
+          this.id = uuidv4()
+         }
+      }
 
   static get jsonSchema() {
     return {
@@ -25,36 +27,38 @@ class Driver extends Model {
         'vehicleTypeId'
       ],
       properties: {
-        id: { type: 'string', format: 'uuid' },
+        id: uuid,
         name: { type: 'string', minLength: 1 },
         email: { type: 'string', format: 'email' },
-        phone: { type: 'string' },
-        vehicleNumber: { type: 'string' },
-        vehicleModel: { type: 'string' },
+        phone: string,
+        vehicleNumber: string,
+        vehicleModel: string,
         isAvailable: { type: 'boolean' },
-        vehicleTypeId: { type: 'string', format: 'uuid' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        vehicleTypeId: uuid,
+        createdAt: timeStamps,
+        updatedAt: timeStamps
       }
     };
   }
 
   static get relationMappings() {
+    const VehicleType = require('./VehicleType');
+    const Ride = require('./Ride');
     return {
       vehicleType: {
         relation: Model.BelongsToOneRelation,
         modelClass: VehicleType,
         join: {
-          from: 'drivers.vehicleTypeId',
-          to: 'vehicle_types.id'
+          from: `${this.tableName}.vehicleTypeId`,
+          to: `${VehicleType.tableName}.id`
         }
       },
       rides: {
         relation: Model.HasManyRelation,
         modelClass: Ride,
         join: {
-          from: 'drivers.id',
-          to: 'rides.driverId'
+          from: `${this.tableName}.id`,
+          to: `${Ride.tableName}.driverId`
         }
       }
     };

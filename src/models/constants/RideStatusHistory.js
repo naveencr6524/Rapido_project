@@ -1,18 +1,27 @@
 const { Model } = require('objection');
+const { v4: uuidv4 } = require("uuid");
+
+const{ uuid }= require('./constants/Val')
 
 class RideStatusHistory extends Model {
   static get tableName() {
     return 'ride_status_history';
   }
 
+  $beforeInsert(){
+         if(!this.id){
+          this.id = uuidv4()
+         }
+      }
+
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['id', 'rideId', 'statusId', 'updated_by'],
+      required: [ 'rideId', 'statusId', 'updated_by'],
       properties: {
-        id: { type: 'string', format: 'uuid' },
-        rideId: { type: 'string', format: 'uuid' },
-        statusId: { type: 'string', format: 'uuid' },
+        id: uuid,
+        rideId: uuid,
+        statusId: uuid,
         updated_by: { type: 'string', enum: ['user', 'driver', 'system'] },
         updated_at: { type: 'string', format: 'date-time' }
       }

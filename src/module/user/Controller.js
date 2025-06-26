@@ -14,8 +14,6 @@ const runValidation = async (req, res, rules) => {
     return false
 }
 
-
-
 exports.signUpDriver = async (req, res) => {
     if (await runValidation(req, res, validations.signUpValidation)) return;
 

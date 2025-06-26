@@ -1,8 +1,15 @@
+
 const { v4: uuidv4 } = require("uuid");
 const User = require("../../models/constants/User");
 const Ride = require("../../models/constants/Ride");
 const RideStatus = require("../../models/constants/RideStatus");
 const RideStatusHistory = require("../../models/constants/RideStatusHistory");
+
+const User = require("../../models/User");
+const Ride = require("../../models/Ride");
+const RideStatus = require("../../models/RideStatus");
+const RideStatusHistory = require("../../models/RideStatusHistory");
+
 
 const createUsers = async (req, res) => {
   const { name, email, phone } = req.body;
@@ -13,7 +20,6 @@ const createUsers = async (req, res) => {
 
   try {
     const users = await User.query().insert({
-      id: uuidv4(),
       name,
       email,
       phone,
@@ -31,10 +37,12 @@ const createUsers = async (req, res) => {
   }
 };
 
+
 const bookRide = async (req, res) => {
   const { userId, pickupLocation, dropLocation, vehicleTypeId } = req.body;
 
   if (!userId || !pickupLocation || !dropLocation || !vehicleTypeId) {
+
     return res.status(400).json({ message: "Must fill all inputs" });
   }
 
@@ -47,16 +55,27 @@ const bookRide = async (req, res) => {
         .json({ message: "Ride status 'pending' not found" });
     }
 
-    const ride = await Ride.query().insert({
-      id: uuidv4(),
-      userId,
-      pickupLocation,
-      dropLocation,
-      vehicleTypeId,
+    const rideData = await Ride.query().upsertGraph({
+  userId,
+  pickupLocation,
+  dropLocation,
+  vehicleTypeId,
+  fare: 100,
+  statusId: pendingStatus.id,
+  statusHistory: [
+    {
       statusId: pendingStatus.id,
-    });
+      updated_by: "user", 
+    }
+  ]
+}, {
+  relate: true,
+  insertMissing: true,
+  noDelete:true
+});
 
-    res.status(201).json({ message: "Ride created successfully", ride });
+
+    res.status(201).json({ message: "Ride created successfully", rideData });
   } catch (error) {
     res
       .status(500)
@@ -68,7 +87,7 @@ const getUserRides = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const userRides = await Ride.query().where("usereId", userId);
+    const userRides = await Ride.query().where("userId", userId);
 
     if (userRides.length == 0) {
       res.status(404).json({ message: "this  user has no rides" });
@@ -108,7 +127,7 @@ const cancelRide = async (req, res) => {
     const ride = await Ride.query().findById(rideId);
 
     if (!ride) {
-      res.status(404).json({ message: "ride not found" });
+       return res.status(404).json({ message: "ride not found" });
     }
 
     if (ride.userId !== userId) {
@@ -116,9 +135,7 @@ const cancelRide = async (req, res) => {
     }
 
     const pendingStatus = await RideStatus.query().findOne({ code: "pending" });
-    const cancelledStatus = await RideStatus.query().findOne({
-      code: "cancelled",
-    });
+    const cancelledStatus = await RideStatus.query().findOne({ code: "cancelled" });
 
     if (ride.statusId !== pendingStatus.id) {
       return res
@@ -128,18 +145,23 @@ const cancelRide = async (req, res) => {
         });
     }
 
-    await Ride.query().findById(rideId).patch({
-      statusId: cancelledStatus.id,
-      updatedAt: new Date().toISOString(),
-    });
-
-    await RideStatusHistory.query().insert({
-      id: uuidv4(),
+   await Ride.query().upsertGraph({
+  id: rideId,
+  statusId: cancelledStatus.id,
+  // updatedAt: new Date().toISOString(),
+  statusHistory: [
+    {
       rideId,
       statusId: cancelledStatus.id,
-      updated_by: "user",
-      updated_at: new Date().toISOString(),
-    });
+      updated_by: "user"
+    }
+  ]
+}, {
+  relate: true,
+  insertMissing: true,
+  noDelete:true
+});
+
 
     res.status(200).json({ message: "Ride cancelled successfully" });
   } catch (error) {
@@ -149,10 +171,38 @@ const cancelRide = async (req, res) => {
   }
 };
 
-module.exports = {
-  createUsers,
-  bookRide,
-  getUserRides,
-  getRideDeatils,
-  cancelRide,
-};
+
+
+const RideStatusHistories = async(req,res) => {
+    const {rideId} = req.params;
+
+  if(!rideId){
+    res.status(400).json({message:"ride id is required"})
+  }
+
+  try {
+      const history = await RideStatusHistory.query()
+      .where('rideId', rideId)
+      .withGraphFetched('status') 
+      .orderBy('updated_at', 'asc'); 
+
+      if(history.length==0){
+        res.status(404).json({message:"No history available for this ride"})
+      }
+
+    res.status(200).json({message:"ride history fetched succesfully",history})
+  } catch (error) {
+      res.status(500).json({message:"error occured while fetching",error:error.messagae})
+  }
+
+}
+
+
+module.exports= {
+    getRideDeatils,
+    createUsers,
+    cancelRide,
+    RideStatusHistories,
+    bookRide,
+    getUserRides
+}
