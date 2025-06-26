@@ -2,7 +2,7 @@ const { v4: uuid } = require('uuid')
 const Driver = require('../models/constants/Driver.js')
 const Ride = require('../models/constants/Ride.js')
 const RideStatus = require('../models/constants/RideStatus.js')
-
+const VehicleType = require('../models/constants/VehicleType.js')
 exports.signUpDriver = async (data) => {
     return await Driver.query().insert({
         id: uuid(),
@@ -46,8 +46,41 @@ exports.updateRideStatus = async (driverId, rideId, statusId) => {
     return await Ride.query().patchAndFetchById(rideId, { statusId })
 }
 
-exports.getRideDetails=async(driverId,rideId)=>{
-    const ride=await Ride.query().findById(rideId)
-  if (!ride || ride.driverId !== driverId) throw new Error('Unauthorized access');
- return await Ride.query().findById(rideId).withGraphFetched('[user, vehicleType, status]')
+exports.getRideDetails = async (driverId, rideId) => {
+    const ride = await Ride.query().findById(rideId)
+    if (!ride || ride.driverId !== driverId) throw new Error('Unauthorized access');
+    return await Ride.query().findById(rideId).withGraphFetched('[user, vehicleType, status]')
+
+}
+
+exports.getAllVehicleTypes = async () => {
+    return await VehicleType.query().orderBy('createdAt', 'desc');
+};
+
+
+exports.assignVehicleTypeToDriver = async (driverId, vehicleTypeId) => {
+    const driver = await Driver.query().findById(driverId);
+    if (!driver) throw new Error('Driver not found');
+
+    return await Driver.query().patchAndFetchById(driverId, {
+        vehicleTypeId,
+    });
+};
+
+exports.bookRide = async (data) => {
+    const { userId, pickup, drop, vehicleTypeId } = data;
+
+    const vehicleType = await VehicleType.query().findById(vehicleTypeId);
+    if (!vehicleType) throw new Error('Invalid vehicle type selected');
+
+    return await Ride.query().insert({
+        id: uuid(),
+        userId,
+        pickup,
+        drop,
+        vehicleTypeId,
+        status: 'pending', // you can link a RideStatus ID if needed
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    })
 }

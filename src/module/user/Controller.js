@@ -82,3 +82,40 @@ exports.getRideDetails = async (req, res) => {
         res.status(403).json({ error: err.message });
     }
 };
+
+
+exports.getAllVehicleTypes = async (req, res) => {
+  try {
+    const types = await driverService.getAllVehicleTypes();
+    res.status(200).json(types);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch vehicle types' });
+  }
+};
+
+
+exports.assignVehicleType = async (req, res) => {
+     if (await runValidation(req, res, validations.assignVehicleTypeValidator)) return;
+
+  const { driverId, vehicleTypeId } = req.body;
+  try {
+    const updated = await driverService.assignVehicleTypeToDriver(driverId, vehicleTypeId);
+    res.status(200).json({ message: 'Vehicle type assigned', driver: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+};
+
+exports.bookRide = async (req, res) => {
+     if (await runValidation(req, res, validations.bookRideValidator)) return;
+
+  try {
+    const ride = await driverService.bookRide(req.body);
+    res.status(201).json({ message: 'Ride booked', ride });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+};
