@@ -1,6 +1,6 @@
 const { Model } = require('objection');
 const { v4: uuidv4 } = require("uuid");
-const {timeStamps, uuid, number} = require('./Val')
+const {timeStamps, uuid, number} = require('./constants/Val')
 
 
 class VehicleType extends Model {
@@ -32,7 +32,7 @@ class VehicleType extends Model {
 
   static get relationMappings() {
     const Driver = require('./Driver');
-    const Ride = require('./Ride');
+    const Ride = require('./constants/Ride');
     return {
       drivers: {
         relation: Model.HasManyRelation,

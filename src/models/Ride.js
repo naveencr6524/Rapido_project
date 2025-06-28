@@ -36,7 +36,7 @@ class Ride extends Model {
   static get relationMappings() {
     const User = require('./User');
     const Driver = require('./Driver'); 
-    const VehicleType = require('./VehicleType'); 
+    const VehicleType = require('../VehicleType'); 
     const RideStatus = require('./RideStatus');
     const RideStatusHistory = require('./RideStatusHistory');
 
