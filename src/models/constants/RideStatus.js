@@ -1,6 +1,6 @@
 const { Model } = require('objection');
 const { v4: uuidv4 } = require("uuid");
-const { string, timeStamps } = require('./constants/Val')
+const { string, timeStamps } = require('../constants/Val')
 
 class RideStatus extends Model {
   static get tableName() {

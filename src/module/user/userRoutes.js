@@ -2,13 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./userController')
 const validators = require('../validators/validators');
-
-const validate  = require('../validators/validateMiddleWare');
- const driverController = require('./driverController.js')
-
 const validate = require('../validators/validateMiddleWare');
-const driverController = require('./Controller.js')
-
 
 // user scenarios
 
@@ -19,16 +13,6 @@ router.get('/getRideDetails/:rideId', validators.getRideDetailsValidator, valida
 router.post('/cancelRide', validators.cancelRideValidator, validate, controller.cancelRide);
 router.get('/rideStatusHistory/:rideId', validators.getRideHistoryValidator, validate, controller.RideStatusHistories)
 
-// Driver Scenarios
-router.post('/createdriver', driverController.signUpDriver);
-router.get('/pendingrides', driverController.getPendingRides);
-router.patch('/pendingrides/:driverId/:rideId', driverController.acceptRide);
-router.get('/driverrides/:driverId', driverController.getDriverRides);
-router.patch('/ridestatus/:driverId/:rideId', driverController.updateRideStatus);
-router.get('/ridedetails/:driverId/:rideId', driverController.getRideDetails);
-router.get('/vehicletypes', driverController.getAllVehicleTypes);
-router.post('/vehicletypes', driverController.assignVehicleType);
-router.post('/rides', driverController.bookRide);
 
 module.exports = router
 

@@ -1,6 +1,6 @@
 const { Model } = require("objection");
 const { v4: uuidv4 } = require("uuid");
-const { timeStamps } = require('./constants/Val')
+const { timeStamps } = require('../constants/Val.js')
 
 class User extends Model {
   static get tableName() {

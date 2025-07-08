@@ -10,8 +10,8 @@ exports.signUpValidation = [
 ];
 
 exports.acceptRideValidation = [
-  param('driverId').isUUID().withMessage('Valid driver ID is required'),
-  param('rideId').isUUID().withMessage('Valid ride ID is required')
+  param('rideId').isUUID().withMessage('Valid ride ID is required'),
+  body('driverId').isUUID().withMessage('Valid driver ID is required')
 ];
 
 exports.updateRideStatusValidation = [
